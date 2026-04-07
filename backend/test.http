@@ -35,3 +35,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlb
 GET http://localhost:9000/27AA8gs9kXd HTTP/1.1
 content-type: application/json
 
+###
+DELETE http://localhost:9000/api/links/6 HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlbWFpbCI6InNlY3JldDIyIiwiZXhwIjoxNzc1NjYyNzc3LCJpYXQiOjE3NzU1NzYzNzd9.aefyOO5Zg2ooOE4gHXJkKY46wy6KeTm_QWEUuEa_SMY
