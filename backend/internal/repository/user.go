@@ -17,14 +17,18 @@ func NewUserRepository(db *pgxpool.Pool) *UserRepository {
 	}
 }
 
-func (u *UserRepository) Create(ctx context.Context, user *models.User) error {
+func (u *UserRepository) Create(ctx context.Context, user *models.User) (*models.User, error) {
 	err := u.db.QueryRow(ctx,
-		`INSERT INTO users (email, password_hash), 
-		 VALUES ($1, $2)
-		 RETURNING id`,
-		user.Email, user.PasswordHash).Scan(&user.ID)
+		`INSERT INTO users (email, password_hash, created_at), 
+		 VALUES ($1, $2, NOW())
+		 RETURNING id, created_at`,
+		user.Email, user.PasswordHash).Scan(&user.ID, &user.CreatedAt)
 
-	return err
+	if err != nil {
+		return nil, err
+	}
+
+	return user, err
 }
 
 func (u *UserRepository) GetByEmail(ctx context.Context, email string) (*models.User, error) {
