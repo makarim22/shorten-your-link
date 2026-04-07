@@ -18,6 +18,17 @@ func NewAuthHandler(service *service.AuthService) *AuthHandler {
 	}
 }
 
+// Register godoc
+// @Summary Register a new user
+// @Description Create a new user account with email and password
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body models.RegisterRequest true "Registration details"
+// @Success 201 {object} models.AuthResponse "User created successfully with user info"
+// @Failure 400 {object} models.AuthResponse "Invalid request body"
+// @Failure 500 {object} models.AuthResponse "Internal server error or email already exists"
+// @Router /api/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req models.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -46,6 +57,18 @@ func (h *AuthHandler) Register(c *gin.Context) {
 
 }
 
+// Login godoc
+// @Summary Login user and get JWT token
+// @Description Authenticate user with email and password, returns JWT token for subsequent requests
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body models.LoginRequest true "Login credentials (email and password)"
+// @Success 201 {object} models.AuthResponse "Login successful with JWT token"
+// @Failure 400 {object} models.AuthResponse "Invalid request body"
+// @Failure 401 {object} models.AuthResponse "Invalid email or password"
+// @Failure 500 {object} models.AuthResponse "Internal server error"
+// @Router /api/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req models.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

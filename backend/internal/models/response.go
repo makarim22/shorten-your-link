@@ -9,7 +9,6 @@ type SuccessResponse struct {
 	Data    interface{} `json:"data"`
 }
 
-// ErrorResponse
 type ErrorResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`

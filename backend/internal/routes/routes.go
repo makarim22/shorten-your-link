@@ -5,6 +5,9 @@ import (
 	"makarim22/shorten-your-link/internal/middleware"
 
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginswagger "github.com/swaggo/gin-swagger"
+	_ "makarim22/shorten-your-link/docs"
 )
 
 func SetupRoutes(router *gin.Engine, container *di.Container) {
@@ -12,7 +15,7 @@ func SetupRoutes(router *gin.Engine, container *di.Container) {
 	linkHandler := container.LinkHandler()
 
 	///
-
+	router.GET("/swagger/*any", ginswagger.WrapHandler(swaggerfiles.Handler))
 	api := router.Group("/api")
 
 	{
