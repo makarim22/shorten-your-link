@@ -28,4 +28,6 @@ func SetupRoutes(router *gin.Engine, container *di.Container) {
 			link.GET("", linkHandler.Get)
 		}
 	}
+
+	router.GET("/:short_code", linkHandler.Redirect)
 }

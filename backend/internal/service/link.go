@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"makarim22/shorten-your-link/internal/lib"
 	"makarim22/shorten-your-link/internal/models"
@@ -74,4 +75,17 @@ func (s *LinkService) GetLink(ctx context.Context, userID int) ([]models.LinkRes
 		return nil, fmt.Errorf("failed to get link: %w", err)
 	}
 	return links, nil
+}
+
+func (s *LinkService) GetLinkByShortCode(ctx context.Context, shortCode string) (*models.Link, error) {
+	link, err := s.repo.GetByShortCode(ctx, shortCode)
+	if err != nil {
+		return nil, errors.New("link not found")
+	}
+
+	if link.ExpiresAt != nil && time.Now().After(*link.ExpiresAt) {
+		return nil, errors.New("link has expired")
+	}
+
+	return link, nil
 }

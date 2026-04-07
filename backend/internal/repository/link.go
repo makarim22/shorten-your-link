@@ -76,3 +76,28 @@ func (r *LinkRepository) GetByUserID(ctx context.Context, userID int) ([]models.
 	}
 	return links, rows.Err()
 }
+
+func (r *LinkRepository) GetByShortCode(ctx context.Context, shortCode string) (*models.Link, error) {
+	query := `
+		SELECT id, user_id, original_url, short_code, is_custom, created_at, expires_at
+		FROM links
+		WHERE short_code = $1
+	`
+
+	var link models.Link
+	err := r.db.QueryRow(ctx, query, shortCode).Scan(
+		&link.ID,
+		&link.UserID,
+		&link.OriginalUrl,
+		&link.ShortCode,
+		&link.IsCustom,
+		&link.CreatedAt,
+		&link.ExpiresAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &link, nil
+}
