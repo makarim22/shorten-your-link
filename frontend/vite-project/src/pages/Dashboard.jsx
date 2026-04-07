@@ -1,53 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Copy, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import http from "../lib/http"
 
 export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [links, setLinks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sample data - replace with API calls later
-  const allLinks = [
-    {
-      id: 1,
-      shortCode: 'aB3+0',
-      fullUrl: 'https://www.architecturaldigest.com/story/modern-mini-...',
-      date: 'OCT 24, 2023',
-      clicks: '1.2K'
-    },
-    {
-      id: 2,
-      shortCode: 'v9Pq2',
-      fullUrl: 'https://medium.com/design-ethics/the-future-of-heade...',
-      date: 'OCT 21, 2023',
-      clicks: '842'
-    },
-    {
-      id: 3,
-      shortCode: 'zR4t1',
-      fullUrl: 'https://github.com/frameworks/modern-stack-documen...',
-      date: 'OCT 19, 2023',
-      clicks: '2.4K'
-    },
-    {
-      id: 4,
-      shortCode: 'mL5kB',
-      fullUrl: 'https://dribbble.com/shots/2145678-Fintech-Dashboar...',
-      date: 'OCT 15, 2023',
-      clicks: '341'
-    },
-    {
-      id: 5,
-      shortCode: 'nW7xC',
-      fullUrl: 'https://example.com/another-long-url-that-needs-sho...',
-      date: 'OCT 10, 2023',
-      clicks: '567'
+ useEffect(() => {
+  const fetchLinks = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No authentication token found. Please log in.');
+        setLoading(false);
+        return;
+      }
+
+      const response = await http('/api/links', {}, { method: 'GET', token });
+      const data = await response.json(); 
+      
+      console.log('data', data);
+
+      if (data.success && data.links) {
+        setLinks(data.links);
+      } else {
+        setError(data.message || 'Failed to fetch links');
+      }
+    } catch (err) {
+      setError('Error fetching links: ' + (err.message || 'Unknown error'));
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  fetchLinks();
+}, []);
 
   // Filter and paginate
-  const filteredLinks = allLinks.filter(link =>
-    link.shortCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    link.fullUrl.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredLinks = links.filter(link =>
+    link.short_code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    link.original_url.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const linksPerPage = 4;
@@ -56,13 +51,24 @@ export default function Dashboard() {
   const paginatedLinks = filteredLinks.slice(startIndex, startIndex + linksPerPage);
 
   const handleCopy = (shortCode) => {
-    navigator.clipboard.writeText(`short.link/${shortCode}`);
+    navigator.clipboard.writeText(`http:localhost:9000/${shortCode}`);
   };
 
   const handleDelete = (id) => {
-    // API call to delete link
+    // todo
     console.log('Delete link:', id);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your links...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -96,6 +102,13 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-12">
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            {error}
+          </div>
+        )}
+
         {/* Stats */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -104,7 +117,7 @@ export default function Dashboard() {
           </div>
           <div className="text-right">
             <p className="text-gray-500 text-sm">TOTAL ACTIVE</p>
-            <p className="text-4xl font-bold text-gray-900">124</p>
+            <p className="text-4xl font-bold text-gray-900">{links.length}</p>
           </div>
         </div>
 
@@ -134,87 +147,97 @@ export default function Dashboard() {
         <div className="bg-white rounded-lg border border-gray-200">
           {paginatedLinks.length > 0 ? (
             <div className="divide-y divide-gray-200">
-              {paginatedLinks.map((link) => (
-                <div key={link.id} className="p-4 hover:bg-gray-50 transition">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.868 2.884l-.321 8.248h8.248l-.321-8.248h-7.606zM9 0a1 1 0 011 1v8.248H1V1a1 1 0 011-1h7z" />
-                        </svg>
-                        <a href="#" className="text-blue-600 font-medium hover:underline">
-                          short.link/{link.shortCode}
-                        </a>
+              {paginatedLinks.map((link) => {
+                const createdDate = new Date(link.created_at).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                }).toUpperCase();
+
+                return (
+                  <div key={link.id} className="p-4 hover:bg-gray-50 transition">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.868 2.884l-.321 8.248h8.248l-.321-8.248h-7.606zM9 0a1 1 0 011 1v8.248H1V1a1 1 0 011-1h7z" />
+                          </svg>
+                          <a href="#" className="text-blue-600 font-medium hover:underline">
+                            http://localhost:9000/{link.short_code}
+                          </a>
+                        </div>
+                        <p className="text-gray-600 text-sm">{link.original_url}</p>
+                        <div className="flex gap-6 mt-2 text-xs text-gray-500">
+                          <span>{createdDate}</span>
+                        </div>
                       </div>
-                      <p className="text-gray-600 text-sm">{link.fullUrl}</p>
-                      <div className="flex gap-6 mt-2 text-xs text-gray-500">
-                        <span>{link.date}</span>
-                        <span>▸</span>
-                        <span>{link.clicks} CLICKS</span>
+                      <div className="flex items-center gap-2 ml-4">
+                        <button
+                          onClick={() => handleCopy(link.short_code)}
+                          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                          title="Copy link"
+                        >
+                          <Copy size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(link.id)}
+                          className="p-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition"
+                          title="Delete link"
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2 ml-4">
-                      <button
-                        onClick={() => handleCopy(link.shortCode)}
-                        className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
-                        title="Copy link"
-                      >
-                        <Copy size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(link.id)}
-                        className="p-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition"
-                        title="Delete link"
-                      >
-                        <Trash2 size={18} />
-                      </button>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="p-8 text-center text-gray-500">
-              No links found matching your search.
+              {filteredLinks.length === 0 && links.length > 0
+                ? 'No links found matching your search.'
+                : 'No links created yet. Start by creating your first shortened link!'}
             </div>
           )}
         </div>
 
         {/* Pagination */}
-        <div className="mt-6 flex items-center justify-between">
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-            disabled={currentPage === 1}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ChevronLeft size={18} />
-            Prev Page
-          </button>
-          <div className="flex items-center gap-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`w-8 h-8 rounded-lg font-medium transition ${
-                  currentPage === page
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-            <span className="text-gray-600 mx-2">of {totalPages}</span>
+        {totalPages > 1 && (
+          <div className="mt-6 flex items-center justify-between">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft size={18} />
+              Prev Page
+            </button>
+            <div className="flex items-center gap-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-8 h-8 rounded-lg font-medium transition ${
+                    currentPage === page
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <span className="text-gray-600 mx-2">of {totalPages}</span>
+            </div>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+              <ChevronRight size={18} />
+            </button>
           </div>
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-            disabled={currentPage === totalPages}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Next
-            <ChevronRight size={18} />
-          </button>
-        </div>
+        )}
 
         {/* Footer */}
         <footer className="mt-12 pt-8 border-t border-gray-200 text-center text-xs text-gray-500">
