@@ -17,3 +17,12 @@ type CreateLinkRequest struct {
 	ShortCode   string     `json:"shortCode" binding:"omitempty,max=20"`
 	ExpiresAt   *time.Time `json:"expiresAt" binding:"omitempty"`
 }
+
+type LinkResponse struct {
+	ID          int       `json:"id"`
+	ShortCode   string    `json:"short_code"`
+	OriginalUrl string    `json:"original_url"`
+	IsCustom    bool      `json:"is_custom"`
+	CreatedAt   time.Time `json:"created_at"`
+	ExpiresAt   time.Time `json:"expires_at,omitempty"`
+}
