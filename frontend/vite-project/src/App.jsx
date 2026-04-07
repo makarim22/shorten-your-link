@@ -4,7 +4,9 @@ import Login from "./pages/LoginPage"
 import Register from "./pages/RegisterPage"
 import Homepage from "./pages/Homepage"
 import Dashboard from "./pages/Dashboard"
-
+import CreateLink from "./pages/CreateLink"
+import NotFound from "./pages/NotFound"
+import Profile from "./pages/Profile"
 
 function App() {
   const router = createBrowserRouter(
@@ -37,8 +39,20 @@ function App() {
           {
             path: '/dashboard',
             element: <Dashboard />
+          },
+           {
+            path: '/create',
+            element: <CreateLink />
+          },
+           {
+            path: '/profile',
+            element: <Profile />
           }
         ]
+      },
+           {
+        path: '*',
+        element: <NotFound />
       }
     ]
   )
