@@ -18,7 +18,7 @@ func NewAuthService(repo *repository.UserRepository) *AuthService {
 	}
 }
 
-func (s *AuthService) Register(ctx context.Context, request *models.RegisterRequest) (*models.UserResponse, error) {
+func (s *AuthService) CreateUser(ctx context.Context, request *models.RegisterRequest) (*models.UserResponse, error) {
 	existingUser, err := s.repo.GetByEmail(ctx, request.Email)
 	if err != nil && existingUser != nil {
 		return nil, fmt.Errorf("already registered email: %w", err)
