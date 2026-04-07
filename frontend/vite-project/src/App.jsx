@@ -3,7 +3,8 @@ import AuthLayout from "./layouts/AuthLayout"
 import Login from "./pages/LoginPage"
 import Register from "./pages/RegisterPage"
 import Homepage from "./pages/Homepage"
-// import Home from "./pages/Home/Home"
+import Dashboard from "./pages/Dashboard"
+
 
 function App() {
   const router = createBrowserRouter(
@@ -32,6 +33,10 @@ function App() {
           {
             path: '',
             element: <Homepage />
+          },
+          {
+            path: '/dashboard',
+            element: <Dashboard />
           }
         ]
       }
