@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"makarim22/shorten-your-link/internal/di"
+	"makarim22/shorten-your-link/internal/lib"
 	"makarim22/shorten-your-link/internal/routes"
 	"os"
 
@@ -14,6 +15,10 @@ import (
 )
 
 func main() {
+
+	if err := lib.InitConfig(); err != nil {
+		log.Fatalf("Failed to initialize config: %v", err)
+	}
 
 	if err := godotenv.Load(); err != nil {
 		log.Println("⚠️  No .env file found, using system environment variables")

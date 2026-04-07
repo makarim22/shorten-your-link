@@ -13,7 +13,7 @@ type Link struct {
 }
 
 type CreateLinkRequest struct {
-	OriginalUrl string     `json:"originalUrl" binding:"required,url"`
-	ShortCode   string     `json:"shortCode" binding:"omitempty,max=20"`
-	ExpiresAt   *time.Time `json:"expiresAt" binding:"omitempty"`
+	OriginalUrl string     `json:"original_url" binding:"required,url"`
+	ShortCode   *string    `json:"short_code"`
+	ExpiresAt   *time.Time `json:"expires_at"`
 }
