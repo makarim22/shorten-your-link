@@ -7,12 +7,28 @@ import (
 	"makarim22/shorten-your-link/internal/di"
 	"makarim22/shorten-your-link/internal/lib"
 	"makarim22/shorten-your-link/internal/routes"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
+
+func corsMiddleware() gin.HandlerFunc {
+	godotenv.Load()
+	return func(ctx *gin.Context) {
+		ctx.Header("Access-Control-Allow-Origin", "*")
+		ctx.Header("Access-Control-Allow-Methods", "POST,GET,OPTIONS,PUT,DELETE,PATCH")
+		ctx.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		ctx.GetHeader("Content-Type")
+		if ctx.Request.Method == http.MethodOptions {
+			ctx.Data(http.StatusOK, "", []byte(""))
+		} else {
+			ctx.Next()
+		}
+	}
+}
 
 func main() {
 
@@ -62,6 +78,7 @@ func main() {
 	}
 
 	router := gin.Default()
+	router.Use(corsMiddleware())
 
 	routes.SetupRoutes(router, container)
 
