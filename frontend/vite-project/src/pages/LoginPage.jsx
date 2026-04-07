@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import FormInput from '../components/FormInput';
+import http from "../lib/http"
 
 export default function LoginPage() {
   const {
@@ -18,17 +19,16 @@ export default function LoginPage() {
   const [apiError, setApiError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const onSubmit = async (data) => {
+const onSubmit = async (data) => {
     setApiError('');
     setSuccessMessage('');
 
     try {
-      const response = await fetch('http://localhost:9000/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+      const response = await http('/api/login', {
+        email: data.email,
+        password: data.password,
+      }, {
+        method: 'POST'
       });
 
       const result = await response.json();
@@ -38,7 +38,7 @@ export default function LoginPage() {
         return;
       }
 
-      // Store token
+      // Store token in localStorage
       localStorage.setItem('token', result.token);
       setSuccessMessage('Login successful! Redirecting...');
       
