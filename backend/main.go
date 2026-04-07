@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"makarim22/shorten-your-link/internal/di"
+	"makarim22/shorten-your-link/internal/routes"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -49,6 +51,15 @@ func main() {
 
 	log.Println("✅ Successfully connected to the database!")
 
+	container, err := di.NewContainer(pool)
+	if err != nil {
+		log.Fatalf("❌ Failed to initialize container: %v", err)
+	}
+
+	router := gin.Default()
+
+	routes.SetupRoutes(router, container)
+
 	serverPort := os.Getenv("SERVER_PORT")
 	if serverPort == "" {
 		serverPort = "8080"
@@ -57,7 +68,6 @@ func main() {
 		serverPort = ":" + serverPort
 	}
 
-	router := gin.Default()
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
