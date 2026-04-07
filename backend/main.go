@@ -51,7 +51,10 @@ func main() {
 
 	serverPort := os.Getenv("SERVER_PORT")
 	if serverPort == "" {
-		serverPort = ":9000"
+		serverPort = "8080"
+	}
+	if serverPort[0] != ':' {
+		serverPort = ":" + serverPort
 	}
 
 	router := gin.Default()
