@@ -50,20 +50,29 @@ func (r *LinkRepository) CheckShortCodeExists(ctx context.Context, shortCode str
 	return exists, nil
 }
 
-func (r *LinkRepository) GetByUserID(ctx context.Context, userID int) (*models.LinkResponse, error) {
-	query := `select id, user_id, short_code, original_url, created_at, expires_at from links where user_id = $1`
-	row := r.db.QueryRow(ctx, query, userID)
-	var link models.LinkResponse
-	err := row.Scan(
-		&link.ID,
-		&link.UserID,
-		&link.ShortCode,
-		&link.OriginalUrl,
-		&link.CreatedAt,
-		&link.ExpiresAt,
-	)
+func (r *LinkRepository) GetByUserID(ctx context.Context, userID int) ([]models.LinkResponse, error) {
+	query := `SELECT id, user_id, short_code, original_url, created_at, expires_at FROM links WHERE user_id = $1 ORDER BY created_at DESC`
+	rows, err := r.db.Query(ctx, query, userID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to scan link: %w", err)
+		return nil, fmt.Errorf("failed to query links: %w", err)
 	}
-	return &link, nil
+	defer rows.Close()
+
+	var links []models.LinkResponse
+	for rows.Next() {
+		var link models.LinkResponse
+		err := rows.Scan(
+			&link.ID,
+			&link.UserID,
+			&link.ShortCode,
+			&link.OriginalUrl,
+			&link.CreatedAt,
+			&link.ExpiresAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan link: %w", err)
+		}
+		links = append(links, link)
+	}
+	return links, rows.Err()
 }

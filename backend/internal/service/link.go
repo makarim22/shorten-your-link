@@ -68,10 +68,10 @@ func (s *LinkService) CreateLink(ctx context.Context, userID int, req *models.Cr
 	}, nil
 }
 
-func (s *LinkService) GetLink(ctx context.Context, userID int) (*models.LinkResponse, error) {
-	link, err := s.repo.GetByUserID(ctx, userID)
+func (s *LinkService) GetLink(ctx context.Context, userID int) ([]models.LinkResponse, error) {
+	links, err := s.repo.GetByUserID(ctx, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get link: %w", err)
 	}
-	return link, nil
+	return links, nil
 }
