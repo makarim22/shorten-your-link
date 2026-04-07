@@ -49,3 +49,21 @@ func (r *LinkRepository) CheckShortCodeExists(ctx context.Context, shortCode str
 
 	return exists, nil
 }
+
+func (r *LinkRepository) GetByUserID(ctx context.Context, userID string) (*models.Link, error) {
+	query := `select id, user_id, short_code, original_url, created_at, expires_at from links where user_id = $1`
+	row := r.db.QueryRow(ctx, query, userID)
+	var link models.Link
+	err := row.Scan(
+		&link.ID,
+		&link.UserID,
+		&link.ShortCode,
+		&link.OriginalUrl,
+		&link.CreatedAt,
+		&link.ExpiresAt,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to scan link: %w", err)
+	}
+	return &link, nil
+}
