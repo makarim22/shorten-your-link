@@ -22,6 +22,19 @@ func NewLinkHandler(service *service.LinkService) *LinkHandler {
 	}
 }
 
+// Create creates a new shortened URL for the authenticated user
+// @Summary Create a new shortened link
+// @Description Creates a new shortened URL from an original URL with optional expiration time
+// @Tags Links
+// @Accept json
+// @Produce json
+// @Param body body models.CreateLinkRequest true "Link creation request"
+// @Security BearerAuth
+// @Success 201 {object} models.LinkResponse "Link created successfully"
+// @Failure 400 {object} models.ErrorResponse "Invalid request body"
+// @Failure 401 {object} models.ErrorResponse "Unauthorized - missing or invalid token"
+// @Failure 500 {object} models.ErrorResponse "Failed to create link"
+// @Router /api/links [post]
 func (h *LinkHandler) Create(c *gin.Context) {
 	var req models.CreateLinkRequest
 
@@ -65,6 +78,17 @@ func (h *LinkHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, LinkResponse)
 }
 
+// Get retrieves all shortened links belonging to the authenticated user
+// @Summary Get user's shortened links
+// @Description Retrieves a list of all shortened links created by the authenticated user
+// @Tags Links
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.ListLinksResponse "Links retrieved successfully"
+// @Success 204 {object} models.ListLinksResponse "No links found"
+// @Failure 401 {object} models.ErrorResponse "Unauthorized - missing or invalid token"
+// @Failure 500 {object} models.ErrorResponse "Failed to retrieve links"
+// @Router /api/links [get]
 func (h *LinkHandler) Get(c *gin.Context) {
 	customerID, exists := c.Get("user_id")
 	if !exists {
@@ -102,6 +126,18 @@ func (h *LinkHandler) Get(c *gin.Context) {
 	})
 }
 
+// Redirect resolves a shortened URL and redirects to the original URL
+// @Summary Redirect to original URL
+// @Description Resolves a shortened code and redirects to the original URL if not expired
+// @Tags Links
+// @Produce json
+// @Param short_code path string true "Shortened URL code"
+// @Success 301 "Redirects to the original URL"
+// @Failure 400 {object} models.ErrorResponse "Short code is required"
+// @Failure 404 {object} models.ErrorResponse "Link not found"
+// @Failure 410 {object} models.ErrorResponse "Link has expired"
+// @Failure 500 {object} models.ErrorResponse "Internal server error"
+// @Router /{short_code} [get]
 func (h *LinkHandler) Redirect(c *gin.Context) {
 	shortCode := c.Param("short_code")
 
@@ -126,6 +162,20 @@ func (h *LinkHandler) Redirect(c *gin.Context) {
 	c.Redirect(http.StatusMovedPermanently, link.OriginalUrl)
 }
 
+// Delete removes a shortened link (only owner can delete)
+// @Summary Delete a shortened link
+// @Description Deletes a shortened link. Only the user who created the link can delete it.
+// @Tags Links
+// @Produce json
+// @Param id path int true "Link ID"
+// @Security BearerAuth
+// @Success 200 {object} models.SuccessResponse "Link deleted successfully"
+// @Failure 400 {object} models.ErrorResponse "Invalid or missing ID"
+// @Failure 401 {object} models.ErrorResponse "Unauthorized - missing or invalid token"
+// @Failure 403 {object} models.ErrorResponse "Forbidden - user does not own this link"
+// @Failure 404 {object} models.ErrorResponse "Link not found"
+// @Failure 500 {object} models.ErrorResponse "Failed to delete link"
+// @Router /api/links/{id} [delete]
 func (h *LinkHandler) Delete(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
