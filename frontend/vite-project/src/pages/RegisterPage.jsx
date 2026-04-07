@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import FormInput from '../components/FormInput';
+import http from "../lib/http"
 
 export default function RegisterPage() {
   const {
@@ -21,38 +22,34 @@ export default function RegisterPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const password = watch('password');
 
-  const onSubmit = async (data) => {
-    setApiError('');
-    setSuccessMessage('');
+const onSubmit = async (data) => {
+  setApiError('');
+  setSuccessMessage('');
 
-    try {
-      const response = await fetch('http://localhost:9000/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-      });
+  try {
+    const response = await http('/api/register', {
+      email: data.email,
+      password: data.password,
+    }, {
+      method: 'POST'
+    });
 
+    if (!response.ok) {
       const result = await response.json();
-
-      if (!response.ok) {
-        setApiError(result.message || 'Registration failed');
-        return;
-      }
-
-      setSuccessMessage('Registration successful! Redirecting to login...');
-      setTimeout(() => {
-        window.location.href = '/auth/login';
-      }, 2000);
-    } catch (error) {
-      setApiError('Network error. Please try again.');
-      console.error('Registration error:', error);
+      setApiError(result.message || 'Registration failed');
+      return;
     }
-  };
+
+    const result = await response.json();
+    setSuccessMessage('Registration successful! Redirecting to login...');
+    setTimeout(() => {
+      window.location.href = '/auth/login';
+    }, 2000);
+  } catch (error) {
+    setApiError('Network error. Please try again.');
+    console.error('Registration error:', error);
+  }
+};
 
   return (
     <>
