@@ -90,8 +90,8 @@ func (s *LinkService) GetLinkByShortCode(ctx context.Context, shortCode string) 
 	return link, nil
 }
 
-func (s *LinkService) DeleteLink(ctx context.Context, id int) error {
-	err := s.repo.Delete(ctx, id)
+func (s *LinkService) DeleteLink(ctx context.Context, id int, userID int) error {
+	err := s.repo.Delete(ctx, id, userID)
 	if err != nil {
 		return fmt.Errorf("failed to delete link: %w", err)
 	}

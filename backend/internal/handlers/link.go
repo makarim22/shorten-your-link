@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"log"
 	"makarim22/shorten-your-link/internal/models"
 	"makarim22/shorten-your-link/internal/service"
 	"net/http"
@@ -126,7 +127,7 @@ func (h *LinkHandler) Redirect(c *gin.Context) {
 }
 
 func (h *LinkHandler) Delete(c *gin.Context) {
-	_, exists := c.Get("user_id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
 			Success: false,
@@ -135,12 +136,21 @@ func (h *LinkHandler) Delete(c *gin.Context) {
 		return
 	}
 
+	userIDInt, ok := userID.(int)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Message: "invalid user id format",
+		})
+		return
+	}
 	id := c.Param("id")
 	if id == "" {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
 			Success: false,
 			Message: "id is required",
 		})
+		return
 	}
 
 	linkID, err := strconv.Atoi(id)
@@ -153,8 +163,9 @@ func (h *LinkHandler) Delete(c *gin.Context) {
 	}
 
 	ctx := context.Background()
-	err = h.service.DeleteLink(ctx, linkID)
+	err = h.service.DeleteLink(ctx, linkID, userIDInt)
 	if err != nil {
+		log.Printf("Delete error details: %v | Error string: %s", err, err.Error())
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Success: false,
 			Message: "failed to delete link",
