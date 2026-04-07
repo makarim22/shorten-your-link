@@ -35,7 +35,7 @@ type AuthResponse struct {
 	Success bool          `json:"success"`
 	Message string        `json:"message"`
 	Token   string        `json:"token"`
-	User    *UserResponse `json:"user"`
+	User    *UserResponse `json:"user,omitempty"`
 }
 
 // CreateLinkResponse

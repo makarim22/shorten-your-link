@@ -45,3 +45,30 @@ func (s *AuthService) CreateUser(ctx context.Context, request *models.RegisterRe
 	}, nil
 
 }
+
+func (s *AuthService) Login(ctx context.Context, request *models.LoginRequest) (*models.AuthResponse, error) {
+	user, err := s.repo.GetByEmail(ctx, request.Email)
+	if err != nil {
+		return nil, fmt.Errorf("cannot find user by email: %w", err)
+	}
+
+	validPassword, err := lib.VerifyPassword(request.Password, user.PasswordHash)
+	if err != nil {
+		return nil, fmt.Errorf("problem hashing the password: %w", err)
+	}
+
+	if !validPassword {
+		return nil, fmt.Errorf("invalid password")
+	}
+
+	token, err := lib.GenerateJWT(user.ID, request.Password)
+	if err != nil {
+		return nil, fmt.Errorf("cannot generate token: %w", err)
+	}
+
+	return &models.AuthResponse{
+		Success: true,
+		Message: "Login berhasil",
+		Token:   token,
+	}, nil
+}
