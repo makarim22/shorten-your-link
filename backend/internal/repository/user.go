@@ -19,7 +19,7 @@ func NewUserRepository(db *pgxpool.Pool) *UserRepository {
 
 func (u *UserRepository) Create(ctx context.Context, user *models.User) (*models.User, error) {
 	err := u.db.QueryRow(ctx,
-		`INSERT INTO users (email, password_hash, created_at), 
+		`INSERT INTO users (email, password_hash, created_at)
 		 VALUES ($1, $2, NOW())
 		 RETURNING id, created_at`,
 		user.Email, user.PasswordHash).Scan(&user.ID, &user.CreatedAt)
