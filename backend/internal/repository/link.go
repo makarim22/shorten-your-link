@@ -101,3 +101,16 @@ func (r *LinkRepository) GetByShortCode(ctx context.Context, shortCode string) (
 
 	return &link, nil
 }
+
+func (r *LinkRepository) Delete(ctx context.Context, id int, userID int) error {
+	query := `DELETE FROM links WHERE id = $1 AND user_id = $2`
+	commandTag, err := r.db.Exec(ctx, query, id, userID)
+	if err != nil {
+		return fmt.Errorf("failed to delete link: %w", err)
+	}
+
+	if commandTag.RowsAffected() == 0 {
+		return fmt.Errorf("link not found or you don't have permission to delete it")
+	}
+	return nil
+}

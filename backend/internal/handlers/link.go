@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"context"
+	"log"
 	"makarim22/shorten-your-link/internal/models"
 	"makarim22/shorten-your-link/internal/service"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -122,4 +124,57 @@ func (h *LinkHandler) Redirect(c *gin.Context) {
 	}
 
 	c.Redirect(http.StatusMovedPermanently, link.OriginalUrl)
+}
+
+func (h *LinkHandler) Delete(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse{
+			Success: false,
+			Message: "user id not found",
+		})
+		return
+	}
+
+	userIDInt, ok := userID.(int)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Message: "invalid user id format",
+		})
+		return
+	}
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Success: false,
+			Message: "id is required",
+		})
+		return
+	}
+
+	linkID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Success: false,
+			Message: "invalid id format",
+		})
+		return
+	}
+
+	ctx := context.Background()
+	err = h.service.DeleteLink(ctx, linkID, userIDInt)
+	if err != nil {
+		log.Printf("Delete error details: %v | Error string: %s", err, err.Error())
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Message: "failed to delete link",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, models.SuccessResponse{
+		Success: true,
+		Message: "link deleted successfully",
+	})
 }

@@ -26,6 +26,7 @@ func SetupRoutes(router *gin.Engine, container *di.Container) {
 		{
 			link.POST("", linkHandler.Create)
 			link.GET("", linkHandler.Get)
+			link.DELETE("/:id", linkHandler.Delete)
 		}
 	}
 

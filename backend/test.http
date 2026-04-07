@@ -25,7 +25,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlb
 ###
 POST http://localhost:9000/api/links HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlbWFpbCI6InNlY3JldDIyIiwiZXhwIjoxNzc1NjYzODE2LCJpYXQiOjE3NzU1Nzc0MTZ9.vHwmSX967yZasTtXoGAmIoUmlm9jnV8R0AthzNpdMrI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlbWFpbCI6InNlY3JldDIyIiwiZXhwIjoxNzc1NjY3NDI2LCJpYXQiOjE3NzU1ODEwMjZ9.iNdj78CdHALLXWktAzmXq_RbLxS60l8T9m2NoDrV5xY
 
 {
   "original_url": "https://www.geeksforgeeks.org/system-design/system-design-url-shortening-service/"
@@ -35,3 +35,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlb
 GET http://localhost:9000/27AA8gs9kXd HTTP/1.1
 content-type: application/json
 
+###
+DELETE http://localhost:9000/api/links/2 HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlbWFpbCI6InNlY3JldDIyIiwiZXhwIjoxNzc1NjY3NDI2LCJpYXQiOjE3NzU1ODEwMjZ9.iNdj78CdHALLXWktAzmXq_RbLxS60l8T9m2NoDrV5xY
