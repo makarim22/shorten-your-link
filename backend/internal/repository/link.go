@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"makarim22/shorten-your-link/internal/models"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -17,13 +18,13 @@ func NewLinkRepository(db *pgxpool.Pool) *LinkRepository {
 	}
 }
 
-func (r *LinkRepository) Create(ctx context.Context, request *models.CreateLinkRequest) (*models.LinkResponse, error) {
-	var Link models.LinkResponse
+func (r *LinkRepository) Create(ctx context.Context, Link *models.Link) error {
+
 	err := r.db.QueryRow(
 		ctx, `INSERT INTO links (user_id, short_code, original_url, is_custom, created_at, expires_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`).Scan(&Link.ID, &Link.ShortCode, &Link.OriginalUrl, &Link.IsCustom, &Link.CreatedAt, &Link.ExpiresAt)
 
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("failed to create Link: %w", err)
 	}
-	return &Link, nil
+	return nil
 }
