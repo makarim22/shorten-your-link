@@ -60,6 +60,7 @@ func (s *LinkService) CreateLink(ctx context.Context, userID int, req *models.Cr
 
 	return &models.LinkResponse{
 		ID:           createdLink.ID,
+		UserID:       createdLink.UserID,
 		ShortCode:    createdLink.ShortCode,
 		OriginalUrl:  createdLink.OriginalUrl,
 		ShortenedUrl: "http://localhost:9000/" + createdLink.ShortCode,

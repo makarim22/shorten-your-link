@@ -24,12 +24,12 @@ func (r *LinkRepository) Create(ctx context.Context, Link *models.Link) (*models
 		`INSERT INTO links (user_id, short_code, original_url, is_custom, created_at, expires_at) 
 		 VALUES ($1, $2, $3, $4, $5, $6) 
 		 RETURNING id, user_id, short_code, original_url, is_custom, created_at, expires_at`,
-		Link.UserID,      // $1
-		Link.ShortCode,   // $2
-		Link.OriginalUrl, // $3
-		Link.IsCustom,    // $4
-		Link.CreatedAt,   // $5
-		Link.ExpiresAt,   // $6
+		Link.UserID,
+		Link.ShortCode,
+		Link.OriginalUrl,
+		Link.IsCustom,
+		Link.CreatedAt,
+		Link.ExpiresAt,
 	).Scan(&Link.ID, &Link.UserID, &Link.ShortCode, &Link.OriginalUrl, &Link.IsCustom, &Link.CreatedAt, &Link.ExpiresAt)
 
 	if err != nil {
