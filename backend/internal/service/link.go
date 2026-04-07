@@ -23,7 +23,6 @@ func (s *LinkService) CreateLink(ctx context.Context, userID int, req *models.Cr
 	var shortCode string
 	var isCustom bool
 
-	// If custom slug is provided, validate and use it
 	if req.ShortCode != nil && *req.ShortCode != "" {
 		exists, err := s.repo.CheckShortCodeExists(ctx, *req.ShortCode)
 		if err != nil {
@@ -35,7 +34,6 @@ func (s *LinkService) CreateLink(ctx context.Context, userID int, req *models.Cr
 		shortCode = *req.ShortCode
 		isCustom = true
 	} else {
-		// Generate random slug
 		var err error
 		shortCode, err = lib.GenerateRandomSlug()
 		if err != nil {
@@ -68,4 +66,12 @@ func (s *LinkService) CreateLink(ctx context.Context, userID int, req *models.Cr
 		CreatedAt:    createdLink.CreatedAt,
 		ExpiresAt:    createdLink.ExpiresAt,
 	}, nil
+}
+
+func (s *LinkService) GetLink(ctx context.Context, userID int) ([]models.LinkResponse, error) {
+	links, err := s.repo.GetByUserID(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get link: %w", err)
+	}
+	return links, nil
 }

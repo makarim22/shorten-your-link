@@ -1,8 +1,32 @@
 ###
-POST http://localhost:9000/api/auth/register HTTP/1.1
+POST http://localhost:9000/api/register HTTP/1.1
 content-type: application/json
 
 {
-  "email": "urif@gmail.com",
+  "email": "hilal@gmail.com",
   "password": "secret22"
+}
+
+###
+POST http://localhost:9000/api/login HTTP/1.1
+content-type: application/json
+
+{
+  "email": "hilal@gmail.com",
+  "password": "secret22"
+}
+
+
+###
+GET http://localhost:9000/api/links HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlbWFpbCI6InNlY3JldDIyIiwiZXhwIjoxNzc1NjYyNzc3LCJpYXQiOjE3NzU1NzYzNzd9.aefyOO5Zg2ooOE4gHXJkKY46wy6KeTm_QWEUuEa_SMY
+
+###
+POST http://localhost:9000/api/links HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJlbWFpbCI6InNlY3JldDIyIiwiZXhwIjoxNzc1NjYxNTU0LCJpYXQiOjE3NzU1NzUxNTR9.BtjA1M9zMvGLqA7YUJUwCTu2kIXXm1n0TFr2uaIg_i0
+
+{
+  "original_url": "https://www.geeksforgeeks.org/system-design/system-design-url-shortening-service/"
 }
