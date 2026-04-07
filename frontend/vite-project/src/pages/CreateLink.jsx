@@ -1,54 +1,63 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, ChevronLeft } from 'lucide-react';
+import http from "../lib/http"
 
 export default function CreateLink() {
   const navigate = useNavigate();
   const [destinationUrl, setDestinationUrl] = useState('');
   const [customSlug, setCustomSlug] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [shortLink, setShortLink] = useState('');
 
-//   const generateRandomSlug = () => {
-//     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-//     let slug = '';
-//     for (let i = 0; i < 6; i++) {
-//       slug += chars.charAt(Math.floor(Math.random() * chars.length));
-//     }
-//     setCustomSlug(slug);
-//   };
-
-  const shortLink = customSlug ? `https://short.link/${customSlug}` : 'https://short.link/your-slug';
+//   const shortLink = customSlug ? `https://short.link/${customSlug}` : 'https://short.link/your-slug';
 
   const handleCreateLink = async (e) => {
     e.preventDefault();
+    setError('');
     
     if (!destinationUrl) {
-      alert('Please enter a destination URL');
+      setError('Please enter a destination URL');
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:9000/api/links', {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No authentication token found. Please log in.');
+        setIsLoading(false);
+        return;
+      }
+
+      const payload = {
+        original_url: destinationUrl
+      };
+
+      if (customSlug.trim()) {
+        payload.short_code = customSlug;
+        payload.is_custom = true;
+      }
+
+      const response = await http('/api/links', payload, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          destinationUrl,
-          customSlug: customSlug || undefined
-        })
+        token
       });
 
-      if (response.ok) {
-        navigate('/dashboard');
-      } else {
-        alert('Failed to create link');
-      }
-    } catch (error) {
-      console.error('Error creating link:', error);
-      alert('Error creating link');
+      const data = await response.json();
+      console.log('Link created:', data);
+
+      setShortLink(data.short_code);
+
+    //   if (data.success) {
+    //     navigate('/dashboard');
+    //   } else {
+    //     setError(data.message || 'Failed to create link');
+    //   }
+    } catch (err) {
+      console.error('Error creating link:', err);
+      setError('Error creating link: ' + (err.message || 'Unknown error'));
     } finally {
       setIsLoading(false);
     }
@@ -92,6 +101,13 @@ export default function CreateLink() {
         </div>
 
         <form onSubmit={handleCreateLink} className="bg-white rounded-lg shadow-sm p-8 space-y-8">
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+          )}
+
           {/* Destination URL */}
           <div>
             <label className="block text-sm font-semibold text-gray-900 mb-3">DESTINATION URL *</label>
@@ -144,7 +160,7 @@ export default function CreateLink() {
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 cursor-disabled flex items-center gap-2"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <span>⚡</span>
               {isLoading ? 'Creating...' : 'Create Link'}
