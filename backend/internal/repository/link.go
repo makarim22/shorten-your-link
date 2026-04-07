@@ -50,10 +50,10 @@ func (r *LinkRepository) CheckShortCodeExists(ctx context.Context, shortCode str
 	return exists, nil
 }
 
-func (r *LinkRepository) GetByUserID(ctx context.Context, userID string) (*models.Link, error) {
+func (r *LinkRepository) GetByUserID(ctx context.Context, userID int) (*models.LinkResponse, error) {
 	query := `select id, user_id, short_code, original_url, created_at, expires_at from links where user_id = $1`
 	row := r.db.QueryRow(ctx, query, userID)
-	var link models.Link
+	var link models.LinkResponse
 	err := row.Scan(
 		&link.ID,
 		&link.UserID,
