@@ -14,19 +14,18 @@ func SetupRoutes(router *gin.Engine, container *di.Container) {
 	///
 
 	api := router.Group("/api")
+
 	{
-		auth := api.Group("/auth")
-		//auth.Use(middleware.AuthMiddleware())
-		{
-			auth.POST("/register", authHandler.Register)
-			auth.POST("/login", authHandler.Login)
-		}
+		api.POST("/register", authHandler.Register)
+		api.POST("/login", authHandler.Login)
 	}
+
 	{
-		shorten := api.Group("/shorten")
-		shorten.Use(middleware.AuthMiddleware())
+		link := api.Group("/links")
+		link.Use(middleware.AuthMiddleware())
 		{
-			shorten.POST("/generate", linkHandler.Create)
+			link.POST("", linkHandler.Create)
+			link.GET("", linkHandler.Get)
 		}
 	}
 }
