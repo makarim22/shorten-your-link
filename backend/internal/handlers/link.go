@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"context"
 	"makarim22/shorten-your-link/internal/models"
 	"makarim22/shorten-your-link/internal/service"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -96,4 +98,28 @@ func (h *LinkHandler) Get(c *gin.Context) {
 		Links:   linkResponse,
 		Count:   len(linkResponse),
 	})
+}
+
+func (h *LinkHandler) Redirect(c *gin.Context) {
+	shortCode := c.Param("short_code")
+
+	if shortCode == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "short code is required"})
+		return
+	}
+
+	ctx := context.Background()
+
+	link, err := h.service.GetLinkByShortCode(ctx, shortCode)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if link.ExpiresAt != nil && time.Now().After(*link.ExpiresAt) {
+		c.JSON(http.StatusGone, gin.H{"error": "short link has expired"})
+		return
+	}
+
+	c.Redirect(http.StatusMovedPermanently, link.OriginalUrl)
 }
