@@ -1,10 +1,46 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+// import  { BASE_URL } from '../services/http';
+
 import Dashboard from '../assets/dashboard.jpg'
+import http from "../lib/http";
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [urlInput, setUrlInput] = useState('');
+  const [shortLink, setShortLink] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const BASE_URL = import.meta.env.VITE_API_URL 
+  console.log("base_url", BASE_URL);
+
+  const handleCreateLink = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const payload = {
+        original_url: urlInput
+      };
+
+      const response = await http('/public/generate', payload, {
+        method: 'POST'
+      });
+
+      const data = await response.json();
+      console.log('Link created:', data);
+
+      setShortLink(`${BASE_URL}/${data.short_code}`);
+      setUrlInput('');
+
+    } catch (err) {
+      console.error('Error creating link:', err);
+      setError('Error creating link: ' + (err.message || 'Unknown error'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -29,7 +65,7 @@ export default function LandingPage() {
                 Login
               </a>
               <a href="/auth/register" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium">
-                Logout
+                Sign up
               </a>
             </div>
 
@@ -82,18 +118,46 @@ export default function LandingPage() {
 
           {/* URL Shortener Demo */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-w-2xl mx-auto">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <input
-                type="text"
-                placeholder="https://very-long-architectural-url.com/asset-id-99238-x1"
-                value={urlInput}
-                onChange={(e) => setUrlInput(e.target.value)}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              />
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition whitespace-nowrap">
-                Shorten
-              </button>
-            </div>
+            <form onSubmit={handleCreateLink}>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <input
+                    type="url"
+                    placeholder="https://very-long-architectural-url.com/asset-id-99238-x1"
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                    required
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                  <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold transition whitespace-nowrap"
+                  >
+                    {loading ? 'Shortening...' : 'Shorten'}
+                  </button>
+                </div>
+
+                {error && (
+                  <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+                    {error}
+                  </div>
+                )}
+
+                {shortLink && (
+                  <div className="text-green-600 text-sm bg-green-50 p-3 rounded-lg flex items-center justify-between">
+                    <span>Shortened link: <a href={shortLink} target="_blank" rel="noopener noreferrer" className="font-semibold underline">{shortLink}</a></span>
+                    <button 
+                      type="button"
+                      onClick={() => navigator.clipboard.writeText(shortLink)}
+                      className="ml-2 text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                )}
+              </div>
+            </form>
           </div>
         </div>
       </div>

@@ -119,7 +119,7 @@ const onSubmit = async (data) => {
         <div className="text-center mt-6 space-y-3">
           <p className="text-sm text-gray-600">
             Don't have an account?{' '}
-            <a href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+            <a href="/auth/register" className="text-blue-600 hover:text-blue-700 font-medium">
               Sign up
             </a>
           </p>

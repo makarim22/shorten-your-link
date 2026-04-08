@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, ChevronLeft } from 'lucide-react';
-import http from "../lib/http"
+import http from "../lib/http";
 
 export default function CreateLink() {
   const navigate = useNavigate();

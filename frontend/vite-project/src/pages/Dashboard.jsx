@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Copy, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import http from "../lib/http"
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -8,6 +9,7 @@ export default function Dashboard() {
   const [links, setLinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const Navigate = useNavigate();
 
  useEffect(() => {
   const fetchLinks = async () => {
@@ -70,6 +72,11 @@ export default function Dashboard() {
     );
   }
 
+  const handleNavigate = () =>{
+    Navigate('/create')
+  }
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -89,7 +96,9 @@ export default function Dashboard() {
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium">
+            <button
+             onClick= {handleNavigate}
+             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium">
               + Create New Link
             </button>
             <button className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300">
