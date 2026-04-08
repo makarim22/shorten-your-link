@@ -7,6 +7,7 @@ import (
 	"makarim22/shorten-your-link/internal/lib"
 	"makarim22/shorten-your-link/internal/models"
 	"makarim22/shorten-your-link/internal/repository"
+	"os"
 	"time"
 )
 
@@ -57,12 +58,17 @@ func (s *LinkService) CreateLink(ctx context.Context, userID int, req *models.Cr
 		return nil, fmt.Errorf("failed to create link: %w", err)
 	}
 
+	baseURL := os.Getenv("BASE_URL")
+	if baseURL == "" {
+		baseURL = "http://localhost:9000/"
+	}
+
 	return &models.LinkResponse{
 		ID:           createdLink.ID,
 		UserID:       createdLink.UserID,
 		ShortCode:    createdLink.ShortCode,
 		OriginalUrl:  createdLink.OriginalUrl,
-		ShortenedUrl: "http://localhost:9000/" + createdLink.ShortCode,
+		ShortenedUrl: baseURL + "/" + createdLink.ShortCode,
 		IsCustom:     createdLink.IsCustom,
 		CreatedAt:    createdLink.CreatedAt,
 		ExpiresAt:    createdLink.ExpiresAt,
