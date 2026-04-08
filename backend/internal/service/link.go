@@ -45,7 +45,7 @@ func (s *LinkService) CreateLink(ctx context.Context, userID int, req *models.Cr
 	}
 
 	link := models.Link{
-		UserID:      userID,
+		UserID:      &userID,
 		ShortCode:   shortCode,
 		OriginalUrl: req.OriginalUrl,
 		IsCustom:    isCustom,
@@ -102,4 +102,58 @@ func (s *LinkService) DeleteLink(ctx context.Context, id int, userID int) error 
 		return fmt.Errorf("failed to delete link: %w", err)
 	}
 	return nil
+}
+
+func (s *LinkService) CreateLinkGuest(ctx context.Context, req *models.CreateLinkRequest) (*models.LinkResponse, error) {
+	var shortCode string
+	var isCustom bool
+
+	if req.ShortCode != nil && *req.ShortCode != "" {
+		exists, err := s.repo.CheckShortCodeExists(ctx, *req.ShortCode)
+		if err != nil {
+			return nil, fmt.Errorf("failed to validate custom slug: %w", err)
+		}
+		if exists {
+			return nil, fmt.Errorf("custom slug '%s' is already taken", *req.ShortCode)
+		}
+		shortCode = *req.ShortCode
+		isCustom = true
+	} else {
+		var err error
+		shortCode, err = lib.GenerateRandomSlug()
+		if err != nil {
+			return nil, fmt.Errorf("failed to generate slug: %w", err)
+		}
+		isCustom = false
+	}
+
+	link := models.Link{
+		UserID:      nil, // Guest user gets 0 or NULL
+		ShortCode:   shortCode,
+		OriginalUrl: req.OriginalUrl,
+		IsCustom:    isCustom,
+		CreatedAt:   time.Now(),
+		ExpiresAt:   req.ExpiresAt,
+	}
+
+	createdLink, err := s.repo.Create(ctx, &link)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create link: %w", err)
+	}
+
+	baseURL := os.Getenv("BASE_URL")
+	if baseURL == "" {
+		baseURL = "http://localhost:9000/"
+	}
+
+	return &models.LinkResponse{
+		ID:           createdLink.ID,
+		UserID:       createdLink.UserID,
+		ShortCode:    createdLink.ShortCode,
+		OriginalUrl:  createdLink.OriginalUrl,
+		ShortenedUrl: baseURL + "/" + createdLink.ShortCode,
+		IsCustom:     createdLink.IsCustom,
+		CreatedAt:    createdLink.CreatedAt,
+		ExpiresAt:    createdLink.ExpiresAt,
+	}, nil
 }

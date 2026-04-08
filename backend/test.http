@@ -3,16 +3,16 @@ POST http://localhost:9000/api/register HTTP/1.1
 content-type: application/json
 
 {
-  "email": "hilal@gmail.com",
+  "email": "arif@gmail.com",
   "password": "secret22"
 }
 
 ###
 POST http://localhost:9000/api/login HTTP/1.1
-content-type: application/json
+Content-type: application/json
 
 {
-  "email": "hilal@gmail.com",
+  "email": "arif@gmail.com",
   "password": "secret22"
 }
 
@@ -20,12 +20,12 @@ content-type: application/json
 ###
 GET http://localhost:9000/api/links HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlbWFpbCI6InNlY3JldDIyIiwiZXhwIjoxNzc1NjYyNzc3LCJpYXQiOjE3NzU1NzYzNzd9.aefyOO5Zg2ooOE4gHXJkKY46wy6KeTm_QWEUuEa_SMY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMCwiZW1haWwiOiJzZWNyZXQyMiIsImV4cCI6MTc3NTYzNTI4NSwiaWF0IjoxNzc1NjM0Mzg1fQ.8XODXos3KM895gbyQYjOfTCzePcBYr6LQl_r1-cxPF4
 
 ###
 POST http://localhost:9000/api/links HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlbWFpbCI6InNlY3JldDIyIiwiZXhwIjoxNzc1NjY3NDI2LCJpYXQiOjE3NzU1ODEwMjZ9.iNdj78CdHALLXWktAzmXq_RbLxS60l8T9m2NoDrV5xY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMCwiZW1haWwiOiJzZWNyZXQyMiIsImV4cCI6MTc3NTYzNTI4NSwiaWF0IjoxNzc1NjM0Mzg1fQ.8XODXos3KM895gbyQYjOfTCzePcBYr6LQl_r1-cxPF4
 
 {
   "original_url": "https://www.geeksforgeeks.org/system-design/system-design-url-shortening-service/"
@@ -39,3 +39,11 @@ content-type: application/json
 DELETE http://localhost:9000/api/links/2 HTTP/1.1
 content-type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlbWFpbCI6InNlY3JldDIyIiwiZXhwIjoxNzc1NjY3NDI2LCJpYXQiOjE3NzU1ODEwMjZ9.iNdj78CdHALLXWktAzmXq_RbLxS60l8T9m2NoDrV5xY
+
+###
+POST http://localhost:9000/public/generate HTTP/1.1
+content-type: application/json
+
+{
+"original_url": "https://www.geeksforgeeks.org/system-design/system-design-url-shortening-service/"
+}

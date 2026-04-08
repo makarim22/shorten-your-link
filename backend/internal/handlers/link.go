@@ -228,3 +228,30 @@ func (h *LinkHandler) Delete(c *gin.Context) {
 		Message: "link deleted successfully",
 	})
 }
+
+func (h *LinkHandler) CreateGuest(c *gin.Context) {
+	var req models.CreateLinkRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Success: false,
+			Message: "invalid request",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	ctx := c.Request.Context()
+
+	LinkResponse, err := h.service.CreateLinkGuest(ctx, &req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Message: "failed to create link",
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, LinkResponse)
+}

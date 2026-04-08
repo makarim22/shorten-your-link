@@ -4,7 +4,7 @@ import "time"
 
 type Link struct {
 	ID          int        `json:"id" db:"id"`
-	UserID      int        `json:"userId" db:"user_id"`
+	UserID      *int       `json:"userId" db:"user_id"`
 	ShortCode   string     `json:"shortCode" db:"short_code"`
 	OriginalUrl string     `json:"originalUrl" db:"original_url"`
 	IsCustom    bool       `json:"isCustom" db:"is_custom"`

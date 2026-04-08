@@ -32,7 +32,7 @@ type UserResponse struct {
 
 type LinkResponse struct {
 	ID           int        `json:"id"`
-	UserID       int        `json:"user_id"`
+	UserID       *int       `json:"user_id"`
 	OriginalUrl  string     `json:"original_url"`
 	ShortCode    string     `json:"short_code"`
 	ShortenedUrl string     `json:"shortened_url"`
