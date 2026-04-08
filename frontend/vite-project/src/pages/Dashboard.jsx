@@ -10,6 +10,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const Navigate = useNavigate();
+  const BASE_URL = import.meta.env.VITE_API_URL;
 
  useEffect(() => {
   const fetchLinks = async () => {
@@ -52,9 +53,11 @@ export default function Dashboard() {
   const startIndex = (currentPage - 1) * linksPerPage;
   const paginatedLinks = filteredLinks.slice(startIndex, startIndex + linksPerPage);
 
+ 
   const handleCopy = (shortCode) => {
-    navigator.clipboard.writeText(`http:localhost:9000/${shortCode}`);
-  };
+  const shortLinkUrl = `${BASE_URL}/${shortCode}`;
+  navigator.clipboard.writeText(shortLinkUrl);
+};
 
   const handleDelete = (id) => {
     // todo
@@ -172,7 +175,7 @@ export default function Dashboard() {
                             <path d="M9.868 2.884l-.321 8.248h8.248l-.321-8.248h-7.606zM9 0a1 1 0 011 1v8.248H1V1a1 1 0 011-1h7z" />
                           </svg>
                           <a href="#" className="text-blue-600 font-medium hover:underline">
-                            http://localhost:9000/{link.short_code}
+                              {`${BASE_URL}/${link.short_code}`}
                           </a>
                         </div>
                         <p className="text-gray-600 text-sm">{link.original_url}</p>
