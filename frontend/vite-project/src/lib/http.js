@@ -1,4 +1,4 @@
-export const BASE_URL = import.meta.env.VITE_BASE_URL || "https://jaka-backend.camps.fahrul.id"
+export const BASE_URL = import.meta.env.VITE_API_URL || "https://jaka-backend.camps.fahrul.id" 
 
 function http(url, body, opts = {}) {
   const headers = {}
